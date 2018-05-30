@@ -2,32 +2,17 @@ var linkTargetFinder = function () {
 	var prefManager = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
 	return {
 		init : function () {
-			gBrowser.addEventListener("load", function () {
-				var autoRun = prefManager.getBoolPref("extensions.linktargetfinder.autorun");
-				if (autoRun) {
-					linkTargetFinder.run();
-				}
-			}, false);
-			this.checkIcoToolbar(!autoRun);
-		},
-		
-		checkIcoToolbar : function(enabled){
-			let docButton = window.document.getElementById('link-target-finder-toolbar-button');
-			if (docButton) {
-				if (enabled){
-					docButton.style.listStyleImage = "url('chrome://linktargetfinder/skin/toolbar-large.png')";
-					docButton.setAttribute("tooltiptext", "Redirects enabled");
-				} else {
-					docButton.style.listStyleImage = "url('chrome://linktargetfinder/skin/toolbar-large-off.png')";
-					docButton.setAttribute("tooltiptext", "Redirects disabled");
-				}
-			}
+			var autoRun = prefManager.getBoolPref("extensions.linktargetfinder.autorun");
+			linkTargetFinder.checkIcoToolbar(autoRun);
+			//gBrowser.addEventListener("load", function () {
+			//	linkTargetFinder.run();
+			//}, false);
 		},
 			
 		run : function () {
 			var autoRun = prefManager.getBoolPref("extensions.linktargetfinder.autorun");
 			prefManager.setBoolPref("extensions.linktargetfinder.autorun", !autoRun);
-			this.checkIcoToolbar(!autoRun);
+			linkTargetFinder.checkIcoToolbar(!autoRun);
 
 			//var head = content.document.getElementsByTagName("head")[0],
 			//	style = content.document.getElementById("link-target-finder-style"),
@@ -57,9 +42,23 @@ var linkTargetFinder = function () {
 			//else {
 			//	alert("Found " + foundLinks + " links with a target attribute");
 			//}	
+		},
+		
+		checkIcoToolbar : function(enabled){
+			let docButton = window.document.getElementById('link-target-finder-toolbar-button');
+			if (docButton) {
+				if (enabled){
+					docButton.style.listStyleImage = "url('chrome://linktargetfinder/skin/toolbar-large.png')";
+					docButton.setAttribute("tooltiptext", "Redirects enabled");
+				} else {
+					docButton.style.listStyleImage = "url('chrome://linktargetfinder/skin/toolbar-large-off.png')";
+					docButton.setAttribute("tooltiptext", "Redirects disabled");
+				}
+			}
 		}
 	};
 }();
+
 window.addEventListener("load", linkTargetFinder.init, false);
 
 
@@ -93,7 +92,7 @@ var httpModifyObserver = {
 		if (cutPos > 0){
 			decUrl = decUrl.substring(cutPos);
 			if (decUrl.indexOf('&') >= 0 && decUrl.indexOf('?') < 0 && (decUrl.indexOf('&')+1) < decUrl.length){
-				//Transforma the first & in ?
+				//Transform the first & in ?
 				decUrl = decUrl.replace('&','?');
 			}
 			return decUrl;
